@@ -26,14 +26,18 @@ export async function POST(request: NextRequest) {
         })
 
         // stdout
-        proc.stdout.on('data', (data) => {
-          controller.enqueue(encoder.encode(data.toString()))
-        })
+        if (proc.stdout) {
+          proc.stdout.on('data', (data) => {
+            controller.enqueue(encoder.encode(data.toString()))
+          })
+        }
 
         // stderr
-        proc.stderr.on('data', (data) => {
-          controller.enqueue(encoder.encode(`\x1b[31m${data.toString()}\x1b[0m`))
-        })
+        if (proc.stderr) {
+          proc.stderr.on('data', (data) => {
+            controller.enqueue(encoder.encode(`\x1b[31m${data.toString()}\x1b[0m`))
+          })
+        }
 
         // 終了時
         proc.on('close', (code) => {
